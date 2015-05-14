@@ -38,18 +38,17 @@
 
 (defn -main
   "I don't do a whole lot ... yet."
-  [& args]
+  [& args] 
   (println "Hello, World!" (:created-on some-edn)))
 
-(defresource article [id]
+(defresource article
   :available-media-types ["text/html"]
-  :handle-ok (fn [id] (str "<html>" id "</html>")))
+  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
 
 (def handler
   (make-handler ["/" {"index.html" (resource :available-media-types ["text/html"]
                            :handle-ok "<html>Hello, Internet.</html>")
-                      ["articles/" :id "/article.html"] #(article)}]))
-;["articles/" :id "/article.html"] :article}]))
+                      ["articles/" :id "/article.html"] article}]))
 
 (def wrap-handler
   (-> handler
