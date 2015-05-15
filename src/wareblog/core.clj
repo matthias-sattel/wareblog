@@ -35,6 +35,8 @@
 	 #wareblog/paragraph (\"Starting with something new is exciting, but can turn soon into frustration. Let's see how it works with \" #wareblog/abbreviation :edn))
 }"))
 
+(def articles
+  {:abc some-edn})
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -43,12 +45,21 @@
 
 (defresource article
   :available-media-types ["text/html"]
+  :allowed-methods [:get :options]
   :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
+
+(defresource show-article
+  :available-media-types ["text/html"]
+  :allowed-methods [:get :options]
+  :handle-ok (fn [ctx] (let [id (get-in ctx [:request :route-params :id])]
+                         ((keyword id) articles))))
 
 (def handler
   (make-handler ["/" {"index.html" (resource :available-media-types ["text/html"]
                            :handle-ok "<html>Hello, Internet.</html>")
-                      ["articles/" :id "/article.html"] article}]))
+                      "articles/" {[:id] article
+                                   [:id "/show"] show-article
+                                   [:id "/comment"] :comment}}]))
 
 (def wrap-handler
   (-> handler
