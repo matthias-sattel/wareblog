@@ -1,65 +1,42 @@
 (ns wareblog.core
-  (require [clojure.edn :as edn]
+  (require [wareblog.articles :refer [get-article get-article-as-html]]
            [liberator.core :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :refer [make-handler]]
            [org.httpkit.server :as server])
   (:gen-class))
 
-(def abbreviations
-  {:edn {:label "edn"
-         :name "Extensible Data Notation"
-         :uri "https://github.com/edn-format/edn"
-         }
-   :md {:label "md"
-        :name "Markdown"
-        :uri "http://daringfireball.net/projects/markdown/"
-        }
-   })
-
-(def edn-readers
-  {'wareblog/author str
-   'wareblog/abbreviation #(str "<strong>" (:name (%1 abbreviations)) "</strong>")
-   'wareblog/abstract #(reduce str %1)
-   'wareblog/paragraph #(first %1)
-   ;'inst str
-   })
-
-(def some-edn
-  (edn/read-string
-   {:readers edn-readers}
-               "{:header \"My first experience with edn\"
-                :created-on #inst \"2015-05-05T21:56:00Z\"
-:created-by #wareblog/author {:given-name \"Matthias\" :name \"Sattel\"}
-:content (#wareblog/abstract (\"This is actually the very first time that I am using \" #wareblog/abbreviation :edn \". In normal situation I would simply use an existing solution for markup of a blog, because there are already good solutions out there, e.g. \" #wareblog/abbreviation :md \". But in this case I want to learn new stuff and thus I will reinvent the wheel.\")
-	 #wareblog/paragraph (\"Starting with something new is exciting, but can turn soon into frustration. Let's see how it works with \" #wareblog/abbreviation :edn))
-}"))
-
-(def articles
-  {:abc some-edn})
-
 (defn -main
   "I don't do a whole lot ... yet."
   [& args] 
-  (println "Hello, World!" (:created-on some-edn)))
+  (println "Hello, World!"))
+
+;(defresource article
+;  :available-media-types ["text/html"]
+;  :allowed-methods [:get :options]
+;  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
 
 (defresource article
-  :available-media-types ["text/html"]
+  :available-media-types ["application/edn" "text/html"]
   :allowed-methods [:get :options]
-  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
+  :handle-ok #(let [media-type
+                    (get-in % [:representation :media-type])
+                    id (get-in % [:request :route-params :id])]
+                (condp = media-type
+                  "application/edn"  (get-article (keyword id))
+                  "text/html" (get-article-as-html (keyword id)))))
 
-(defresource show-article
+(defresource comment-article
   :available-media-types ["text/html"]
-  :allowed-methods [:get :options]
+  :allowed-methods [:get :options :post]
   :handle-ok (fn [ctx] (let [id (get-in ctx [:request :route-params :id])]
-                         ((keyword id) articles))))
+                         (get-article (keyword id)))))
 
 (def handler
   (make-handler ["/" {"index.html" (resource :available-media-types ["text/html"]
                            :handle-ok "<html>Hello, Internet.</html>")
                       "articles/" {[:id] article
-                                   [:id "/show"] show-article
-                                   [:id "/comment"] :comment}}]))
+                                   [:id "/comment"] comment-article}}]))
 
 (def wrap-handler
   (-> handler
@@ -74,4 +51,3 @@
   (when-not (nil? server)
     (@server :timeout 100)
     (reset! server nil)))
-
