@@ -3,7 +3,8 @@
            [liberator.core :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :refer [make-handler]]
-           [org.httpkit.server :as server])
+           [org.httpkit.server :as server]
+           [environ.core :refer [env]])
   (:gen-class))
 
 (defn -main
@@ -14,7 +15,14 @@
 ;(defresource article
 ;  :available-media-types ["text/html"]
 ;  :allowed-methods [:get :options]
-;  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
+                                        ;  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
+
+(def default-http-port
+  3000)
+
+(def http-port
+  (let [ext-http-port (env :wareblog-http-port)]
+    (if (nil? ext-http-port) default-http-port (Integer/valueOf ext-http-port))))
 
 (defresource article
   :available-media-types ["application/edn" "text/html"]
@@ -45,7 +53,7 @@
 (defonce server (atom nil))
 
 (defn start-server []
-  (reset! server (server/run-server #'wrap-handler {:port 3000 :join? false})))
+  (reset! server (server/run-server #'wrap-handler {:port http-port :join? false})))
 
 (defn stop-server []
   (when-not (nil? server)
