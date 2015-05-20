@@ -7,11 +7,6 @@
            [environ.core :refer [env]])
   (:gen-class))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args] 
-  (println "Hello, World!"))
-
 ;(defresource article
 ;  :available-media-types ["text/html"]
 ;  :allowed-methods [:get :options]
@@ -59,3 +54,8 @@
   (when-not (nil? server)
     (@server :timeout 100)
     (reset! server nil)))
+
+(defn -main
+  "Just start a http-kit server."
+  [& args] 
+  (start-server))
