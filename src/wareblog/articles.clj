@@ -1,5 +1,9 @@
 (ns wareblog.articles
-  (require [clojure.edn :as edn]))
+  (require [clojure.edn :as edn]
+           [taoensso.timbre :as timbre]))
+
+;Provide alias for logging with timbre
+(timbre/refer-timbre)
 
 (def abbreviations
   {:edn {:label "edn"
@@ -29,9 +33,11 @@
 }")
 
 (defn- article-to-html [article]
-  (edn/read-string
+  (do
+    (debug "Render article " article " to HTML,")
+    (edn/read-string
    {:readers edn-readers}
-               article))
+               article)))
 
 (def articles
   {:abc some-edn})

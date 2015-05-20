@@ -8,7 +8,8 @@
 			[ring/ring-core "1.3.2"]
 			[http-kit "2.1.18"]
 			[bidi "1.18.11"]
-			[liberator "0.12.2"]])
+			[liberator "0.12.2"]
+			[com.taoensso/timbre "3.4.0"]])
 
 (require '[adzerk.boot-cljs :refer :all])
 (require '[adzerk.boot-test :refer :all])

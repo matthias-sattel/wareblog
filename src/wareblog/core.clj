@@ -4,8 +4,12 @@
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :refer [make-handler]]
            [org.httpkit.server :as server]
-           [environ.core :refer [env]])
+           [environ.core :refer [env]]
+           [taoensso.timbre :as timbre])
   (:gen-class))
+
+;Provide alias for logging with timbre
+(timbre/refer-timbre)
 
 ;(defresource article
 ;  :available-media-types ["text/html"]
@@ -48,7 +52,9 @@
 (defonce server (atom nil))
 
 (defn start-server []
-  (reset! server (server/run-server #'wrap-handler {:port http-port :join? false})))
+  (do
+    (info "Starting the server at port " http-port)
+    (reset! server (server/run-server #'wrap-handler {:port http-port :join? false}))))
 
 (defn stop-server []
   (when-not (nil? server)
