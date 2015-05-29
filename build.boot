@@ -1,5 +1,6 @@
 (set-env!
-	:source-paths #{"src","test"}
+	:source-paths #{"src/main/clj","src/test/clj","src/main/resources"}
+	:resource-paths #{"src/main/resources"}	
 	:dependencies '[
 			[adzerk/boot-test "1.0.4"]
 			[adzerk/boot-cljs "0.0-2814-4"]
@@ -9,7 +10,9 @@
 			[http-kit "2.1.18"]
 			[bidi "1.18.11"]
 			[liberator "0.12.2"]
-			[com.taoensso/timbre "3.4.0"]])
+			[com.taoensso/timbre "3.4.0"];logging
+			[selmer "0.8.2"];templates
+			])
 
 (require '[adzerk.boot-cljs :refer :all])
 (require '[adzerk.boot-test :refer :all])

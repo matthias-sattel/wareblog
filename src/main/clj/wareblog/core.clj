@@ -1,15 +1,18 @@
 (ns wareblog.core
-  (require [wareblog.articles :refer [get-article get-article-as-html]]
+  (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
            [liberator.core :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :refer [make-handler]]
            [org.httpkit.server :as server]
            [environ.core :refer [env]]
-           [taoensso.timbre :as timbre])
+           [taoensso.timbre :as timbre]
+           [selmer.parser :refer [render render-file set-resource-path!]])
   (:gen-class))
 
 ;Provide alias for logging with timbre
 (timbre/refer-timbre)
+
+;(set-resource-path! (clojure.java.io/resource "./resources/"))
 
 ;(defresource article
 ;  :available-media-types ["text/html"]
@@ -29,9 +32,11 @@
   :handle-ok #(let [media-type
                     (get-in % [:representation :media-type])
                     id (get-in % [:request :route-params :id])]
-                (condp = media-type
+                (do
+                  (debug (get-article (keyword id)))
+                  (condp = media-type
                   "application/edn"  (get-article (keyword id))
-                  "text/html" (get-article-as-html (keyword id)))))
+                  "text/html" (render-file "templates/article.html" {:title (get-article-header (keyword id)), :article (get-article-as-html (keyword id))})))))
 
 (defresource comment-article
   :available-media-types ["text/html"]
@@ -41,7 +46,8 @@
 
 (def handler
   (make-handler ["/" {"index.html" (resource :available-media-types ["text/html"]
-                           :handle-ok "<html>Hello, Internet.</html>")
+                                             :handle-ok (render-file "templates/home.html" {:name "World"})
+                                             )
                       "articles/" {[:id] article
                                    [:id "/comment"] comment-article}}]))
 
