@@ -1,9 +1,9 @@
 (ns wareblog.core
   (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
-           [liberator.core :refer [resource defresource]]
+           [liberator.core :as liberator :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
-           [bidi.ring :refer [make-handler]]
-           [org.httpkit.server :as server]
+           [bidi.ring :as bidi-ring :refer [make-handler]]
+           [org.httpkit.server :as httpkit-server :refer [run-server]]
            [environ.core :refer [env]]
            [taoensso.timbre :as timbre]
            [selmer.parser :refer [render render-file set-resource-path!]])
@@ -26,7 +26,7 @@
   (let [ext-http-port (env :wareblog-http-port)]
     (if (nil? ext-http-port) default-http-port (Integer/valueOf ext-http-port))))
 
-(defresource article
+(liberator/defresource article
   :available-media-types ["application/edn" "text/html"]
   :allowed-methods [:get :options]
   :handle-ok #(let [media-type
@@ -38,14 +38,14 @@
                   "application/edn"  (get-article (keyword id))
                   "text/html" (render-file "templates/article.html" {:title (get-article-header (keyword id)), :article (get-article-as-html (keyword id))})))))
 
-(defresource comment-article
+(liberator/defresource comment-article
   :available-media-types ["text/html"]
   :allowed-methods [:get :options :post]
   :handle-ok (fn [ctx] (let [id (get-in ctx [:request :route-params :id])]
                          (get-article (keyword id)))))
 
 (def handler
-  (make-handler ["/" {"index.html" (resource :available-media-types ["text/html"]
+  (bidi-ring/make-handler ["/" {"index.html" (liberator/resource :available-media-types ["text/html"]
                                              :handle-ok (render-file "templates/home.html" {:name "World"})
                                              )
                       "articles/" {[:id] article
@@ -60,7 +60,7 @@
 (defn start-server []
   (do
     (info "Starting the server at port " http-port)
-    (reset! server (server/run-server #'wrap-handler {:port http-port :join? false}))))
+    (reset! server (httpkit-server/run-server #'wrap-handler {:port http-port :join? false}))))
 
 (defn stop-server []
   (when-not (nil? server)

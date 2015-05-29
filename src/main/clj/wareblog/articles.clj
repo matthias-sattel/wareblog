@@ -1,5 +1,5 @@
 (ns wareblog.articles
-  (require [clojure.edn :as edn]
+  (require [clojure.edn :as edn :refer [read-string]]
            [taoensso.timbre :as timbre]))
 
 ;Provide alias for logging with timbre
