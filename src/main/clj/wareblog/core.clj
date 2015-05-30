@@ -44,12 +44,15 @@
   :handle-ok (fn [ctx] (let [id (get-in ctx [:request :route-params :id])]
                          (get-article (keyword id)))))
 
+(liberator/defresource home
+  :available-media-types ["text/html"]
+  :handle-ok (render-file "templates/home.html" {:name "World"}))
+
 (def handler
-  (bidi-ring/make-handler ["/" {"index.html" (liberator/resource :available-media-types ["text/html"]
-                                             :handle-ok (render-file "templates/home.html" {:name "World"})
-                                             )
-                      "articles/" {[:id] article
-                                   [:id "/comment"] comment-article}}]))
+  (bidi-ring/make-handler ["/" {"" home
+                                "index.html" home
+                                "articles/" {[:id] article
+                                             [:id "/comment"] comment-article}}]))
 
 (def wrap-handler
   (-> handler
