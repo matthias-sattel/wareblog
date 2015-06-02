@@ -2,11 +2,20 @@
 <html>
 <head>
 <meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css" href="/resources/css/{% if dev  %}pure-min.css{% else %}pure.css{% endif %}">
+
 <title>{{title}}</title>
 </head>
 
 <body>
-{{article|safe}}
+  {{article|safe}}
+
+<a class="pure-button" href="#">A Pure Button</a>
+<button class="pure-button">A Pure Button</button>
+  
 </body>
 
 </html> 

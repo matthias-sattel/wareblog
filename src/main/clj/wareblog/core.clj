@@ -2,7 +2,7 @@
   (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
            [liberator.core :as liberator :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
-           [bidi.ring :as bidi-ring :refer [make-handler]]
+           [bidi.ring :as bidi-ring :refer [make-handler resources resources-maybe]]
            [org.httpkit.server :as httpkit-server :refer [run-server]]
            [environ.core :refer [env]]
            [taoensso.timbre :as timbre]
@@ -36,7 +36,7 @@
                   (debug (get-article (keyword id)))
                   (condp = media-type
                   "application/edn"  (get-article (keyword id))
-                  "text/html" (render-file "templates/article.html" {:title (get-article-header (keyword id)), :article (get-article-as-html (keyword id))})))))
+                  "text/html" (render-file "templates/article.html" {:dev (env :wareblog-dev), :title (get-article-header (keyword id)), :article (get-article-as-html (keyword id))})))))
 
 (liberator/defresource comment-article
   :available-media-types ["text/html"]
@@ -52,7 +52,8 @@
   (bidi-ring/make-handler ["/" {"" home
                                 "index.html" home
                                 "articles/" {[:id] article
-                                             [:id "/comment"] comment-article}}]))
+                                             [:id "/comment"] comment-article}
+                                "resources/" (resources-maybe {:prefix "public/"})}]))
 
 (def wrap-handler
   (-> handler
