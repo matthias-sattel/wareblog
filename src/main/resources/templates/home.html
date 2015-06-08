@@ -1,3 +1,19 @@
+<!DOCTYPE html>
 <html>
-  <h1>Hello {{name}}</h1>
+  <head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="Blog about software.">
+
+    <link rel="stylesheet" type="text/css" href="/resources/css/{% if dev  %}pure-min.css{% else %}pure.css{% endif %}">
+
+    <title>{{title}}</title>
+  </head>
+  
+  <body>
+    <h1>Hello {{name}}</h1>
+  </body>
+  
 </html>

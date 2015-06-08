@@ -29,14 +29,16 @@
 (liberator/defresource article
   :available-media-types ["application/edn" "text/html"]
   :allowed-methods [:get :options]
-  :handle-ok #(let [media-type
-                    (get-in % [:representation :media-type])
+  :handle-ok #(let [media-type (get-in % [:representation :media-type])
                     id (get-in % [:request :route-params :id])]
                 (do
-                  (debug (get-article (keyword id)))
+                  (debug (str "Requesting article with id " id))
                   (condp = media-type
-                  "application/edn"  (get-article (keyword id))
-                  "text/html" (render-file "templates/article.html" {:dev (env :wareblog-dev), :title (get-article-header (keyword id)), :article (get-article-as-html (keyword id))})))))
+                    "application/edn"  (get-article (keyword id))
+                    "text/html" (let [article-as-html-map (get-article-as-html (keyword id))]
+                                  ;(debug article-as-html-map)))
+                                  (render-file "templates/article.html" {:dev (env :wareblog-dev), :title (:header article-as-html-map), :article-title (:header article-as-html-map), :article-abstract (:abstract article-as-html-map), :article-content (:content article-as-html-map)})))
+                  )))
 
 (liberator/defresource comment-article
   :available-media-types ["text/html"]

@@ -1,17 +1,40 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" type="text/css" href="/resources/css/{% if dev  %}pure-min.css{% else %}pure.css{% endif %}">
+    <meta name="description" content="Blog about software.">
 
-<title>{{title}}</title>
-</head>
+    <link rel="stylesheet" type="text/css" href="/resources/css/{% if dev  %}pure-min.css{% else %}pure.css{% endif %}">
 
-<body>
-  {{article|safe}}
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="/resources/css/articles-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="/resources/css/articles.css">
+    <!--<![endif]-->
+
+    <title>{{title}}</title>
+  </head>
+
+  <body>
+    <div class="content">
+      <section class="post">
+	<header class="post-header">
+	  <h2 class="post-title">
+	    {{article-title|safe}}
+	  </h2>
+	</header>
+	<div class="post-abstract">
+	  {{article-abstract|safe}}
+	</div>
+	<div class="post-content">
+	  {{article-content|safe}}
+	</div>
+      </section>
+    </div>
 
 <a class="pure-button" href="#">A Pure Button</a>
 <button class="pure-button">A Pure Button</button>
