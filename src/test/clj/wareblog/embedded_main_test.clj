@@ -1,25 +1,24 @@
-(ns wareblog.core-test
+(ns wareblog.embedded-main-test
   (require [clojure.edn :as edn :refer [read-string]]
            [clojure.test :refer [deftest is testing use-fixtures]]
-           [wareblog.core :refer :all]
+           [wareblog.embedded-main :as main]
+           [wareblog.system :as system]
            [org.httpkit.client :as http-client :refer [get]]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 1 1))
-    (is (> 3 2))))
+(def system
+  (system/wareblog-system {:http-port 3002}))
 
 (defn server-setup-and-teardown [f]
-  (start-server)
+  (main/start-system system)
   (f)
-  (stop-server))
+  (main/stop-system system))
 
 (use-fixtures :once server-setup-and-teardown)
 
 (deftest handle-a-request
     (testing "We will do some REST API testing here"
       (is (= 1 1))
-      (let [{:keys [status body headers] :as resp} @(http-client/get "http://localhost:3000/index.html")]
+      (let [{:keys [status body headers] :as resp} @(http-client/get "http://localhost:3002/index.html")]
                  (is (= (str status) "200"))
                  (is (= (:server headers) "http-kit")))
       ))

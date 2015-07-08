@@ -1,30 +1,26 @@
-(ns wareblog.core
+(ns wareblog.system
   (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
+           [com.stuartsierra.component :as component]
+           [wareblog.http-component :as http-component]
            [liberator.core :as liberator :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :as bidi-ring :refer [make-handler resources resources-maybe]]
            [org.httpkit.server :as httpkit-server :refer [run-server]]
            [environ.core :refer [env]]
            [taoensso.timbre :as timbre]
-           [selmer.parser :refer [render render-file set-resource-path!]])
-  (:gen-class))
+           [selmer.parser :refer [render render-file set-resource-path!]]))
 
 ;Provide alias for logging with timbre
 (timbre/refer-timbre)
 
-;(set-resource-path! (clojure.java.io/resource "./resources/"))
-
-;(defresource article
-;  :available-media-types ["text/html"]
-;  :allowed-methods [:get :options]
-                                        ;  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
-
 (def default-http-port
   3000)
 
-(def http-port
+(defn http-port [port]
   (let [ext-http-port (env :wareblog-http-port)]
-    (if (nil? ext-http-port) default-http-port (Integer/valueOf ext-http-port))))
+    (if (not (nil? port))
+      port
+      (if (nil? ext-http-port) default-http-port (Integer/valueOf ext-http-port)))))
 
 (liberator/defresource article
   :available-media-types ["application/edn" "text/html"]
@@ -50,30 +46,36 @@
   :available-media-types ["text/html"]
   :handle-ok (render-file "templates/home.html" {:name "World"}))
 
-(def handler
+(defn handler []
   (bidi-ring/make-handler ["/" {"" home
                                 "index.html" home
                                 "articles/" {[:id] article
                                              [:id "/comment"] comment-article}
                                 "resources/" (resources-maybe {:prefix "public/"})}]))
 
-(def wrap-handler
-  (-> handler
+(defn wrap-handler []
+  (-> (handler)
       wrap-params))
+
+(defn wareblog-system [config-options]
+  (do 
+    (info "Building wareblog system")
+    (-> (component/system-map
+         :http (http-component/new-http-server (http-port (:http-port config-options)) (wrap-handler))))))
+
+
+
+;(def system
+;  (wareblog-system {:http-port (http-port) :handler wrap-handler}))
 
 (defonce server (atom nil))
 
 (defn start-server []
   (do
-    (info "Starting the server at port " http-port)
-    (reset! server (httpkit-server/run-server #'wrap-handler {:port http-port :join? false}))))
+    (info "Starting the server at port " (http-port))
+    (reset! server (httpkit-server/run-server #'wrap-handler {:port (http-port) :join? false}))))
 
 (defn stop-server []
   (when-not (nil? server)
     (@server :timeout 100)
     (reset! server nil)))
-
-(defn -main
-  "Just start a http-kit server."
-  [& args] 
-  (start-server))

@@ -4,7 +4,7 @@
 	:dependencies '[
 			[adzerk/boot-test "1.0.4"]
 			[adzerk/boot-cljs "0.0-2814-4"]
-			[org.clojure/clojure "1.6.0"]
+			[org.clojure/clojure "1.7.0-RC1"]
 			[environ "1.0.0"]
 			[ring/ring-core "1.3.2"]
 			[http-kit "2.1.18"]
@@ -12,6 +12,7 @@
 			[liberator "0.12.2"]
 			[com.taoensso/timbre "3.4.0"];logging
 			[selmer "0.8.2"];templates
+			[com.stuartsierra/component "0.2.3"]
 			])
 
 (require '[adzerk.boot-cljs :refer :all])
@@ -24,7 +25,7 @@
 	aot {:all true}
 	jar {
 	    :manifest {"description" "Software for creating a weblog"}
-	    :main 'wareblog.core })
+	    :main 'wareblog.embedded-main })
 
 (deftask build
 	 "Building the project"
