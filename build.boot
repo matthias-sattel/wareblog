@@ -22,10 +22,11 @@
 	pom {
 	    :project 'wareblog
 	    :version "0.1.0-SNAPSHOT" }
-	aot {:all true}
+	;aot {:all true}
+	aot {:namespace '#{wareblog.embedded}}
 	jar {
 	    :manifest {"description" "Software for creating a weblog"}
-	    :main 'wareblog.embedded-main })
+	    :main 'wareblog.embedded })
 
 (deftask build
 	 "Building the project"

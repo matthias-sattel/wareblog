@@ -1,7 +1,7 @@
-(ns wareblog.embedded-main-test
+(ns wareblog.embedded-test
   (require [clojure.edn :as edn :refer [read-string]]
            [clojure.test :refer [deftest is testing use-fixtures]]
-           [wareblog.embedded-main :as main]
+           [wareblog.embedded :as main]
            [wareblog.system :as system]
            [org.httpkit.client :as http-client :refer [get]]))
 
@@ -9,9 +9,9 @@
   (system/wareblog-system {:http-port 3002}))
 
 (defn server-setup-and-teardown [f]
-  (main/start-system system)
+  (alter-var-root #'system main/start-system)
   (f)
-  (main/stop-system system))
+  (alter-var-root #'system main/stop-system))
 
 (use-fixtures :once server-setup-and-teardown)
 

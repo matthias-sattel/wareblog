@@ -1,9 +1,27 @@
 (ns wareblog.articles
   (require [clojure.edn :as edn]
-           [taoensso.timbre :as timbre]))
+           [taoensso.timbre :as timbre]
+           [com.stuartsierra.component :as component]))
 
 ;Provide alias for logging with timbre
 (timbre/refer-timbre)
+
+(defrecord Articles [state storage]
+
+  component/Lifecycle
+
+  (start [component]
+    (info "Starting the articles component using storage " storage)
+    (assoc component :state "started"))
+
+  (stop [component]
+    (info "Stopping the articles component")
+    (assoc component :storage nil :state "stopped"))
+
+  )
+
+(defn new-articles-component []
+  (map->Articles {}))
 
 (def abbreviations
   {:edn {:label "edn"

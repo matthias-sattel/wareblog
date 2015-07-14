@@ -9,9 +9,9 @@
   (system/wareblog-system {:http-port 3005}))
 
 (defn server-setup-and-teardown [f]
-  (component/start system)
+  (alter-var-root #'system component/start)
   (f)
-  (component/stop system))
+  (alter-var-root #'system component/stop))
 
 (use-fixtures :once server-setup-and-teardown)
 

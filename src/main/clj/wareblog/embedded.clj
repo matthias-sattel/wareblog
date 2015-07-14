@@ -1,4 +1,4 @@
-(ns wareblog.embedded-main
+(ns wareblog.embedded
   (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
            [com.stuartsierra.component :as component]
            [taoensso.timbre :as timbre]
@@ -22,10 +22,10 @@
   (component/stop system))
 
 (defn -main
-  "Just start a http-kit server."
+  "Startup the embedded http server and the other components."
   [& args] 
   ;(start-server)
   (let [system (system/wareblog-system {})]
     (do
-      (info "Try to start wareblog system")
-      (start-system (system)))))
+      (info "Try to start wareblog system " system)
+      (component/start system))))

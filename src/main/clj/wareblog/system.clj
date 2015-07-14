@@ -2,6 +2,8 @@
   (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
            [com.stuartsierra.component :as component]
            [wareblog.http-component :as http-component]
+           [wareblog.article-storage-test-component :as article-storage-test-component]
+           [wareblog.articles :as articles]
            [liberator.core :as liberator :refer [resource defresource]]
            [ring.middleware.params :refer [wrap-params]]
            [bidi.ring :as bidi-ring :refer [make-handler resources resources-maybe]]
@@ -57,11 +59,17 @@
   (-> (handler)
       wrap-params))
 
-(defn wareblog-system [config-options]
+ (defn wareblog-system [config-options]
   (do 
     (info "Building wareblog system")
     (-> (component/system-map
-         :http (http-component/new-http-server (http-port (:http-port config-options)) (wrap-handler))))))
+         :article-storage (article-storage-test-component/new-storage)
+         :articles (articles/new-articles-component)
+         :http (http-component/new-http-server (http-port (:http-port config-options)) (wrap-handler)))
+        (component/system-using {:articles {:storage :article-storage}
+                                 :http {:storage :article-storage
+                                        :articles :articles}}))
+    ))
 
 
 
