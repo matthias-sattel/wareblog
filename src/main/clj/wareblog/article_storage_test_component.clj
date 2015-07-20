@@ -1,6 +1,7 @@
 (ns wareblog.article-storage-test-component
   (require [com.stuartsierra.component :as component]
            [taoensso.timbre :as timbre]
+           [wareblog.article-storage :as storage]
            ))
 
 ;Provide alias for logging with timbre
@@ -16,10 +17,6 @@
 
 (def articles
   {:abc some-edn-string})
-
-(defprotocol Article-Storage
-  (get-by-id [id])
-  )
 
 (defrecord Storage [state]
 
@@ -38,9 +35,9 @@
       this
     ))
 
-  Article-Storage
+  storage/Article-Storage
 
-  (get-by-id [id]
+  (get-by-id [this id]
     (id articles) 
     )
   )

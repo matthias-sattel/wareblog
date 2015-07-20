@@ -1,6 +1,5 @@
 (ns wareblog.embedded
-  (require [wareblog.articles :refer [get-article get-article-as-html get-article-header]]
-           [com.stuartsierra.component :as component]
+  (require [com.stuartsierra.component :as component]
            [taoensso.timbre :as timbre]
            [wareblog.system :as system])
   (:gen-class))
@@ -9,11 +8,6 @@
 (timbre/refer-timbre)
 
 ;(set-resource-path! (clojure.java.io/resource "./resources/"))
-
-;(defresource article
-;  :available-media-types ["text/html"]
-;  :allowed-methods [:get :options]
-                                        ;  :handle-ok (fn [ctx] (str "Id of the request: " (get-in ctx [:request :route-params :id]))))
 
 (defn start-system [system]
   (component/start system))
