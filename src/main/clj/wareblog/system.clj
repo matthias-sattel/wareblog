@@ -1,7 +1,7 @@
 (ns wareblog.system
   (require [com.stuartsierra.component :as component]
            [wareblog.http-component :as http-component]
-           [wareblog.article-storage-test-component :as article-storage-test-component]
+           [wareblog.atom-storage :as atom-storage]
            [wareblog.articles :as articles]
            [environ.core :refer [env]]
            [taoensso.timbre :as timbre]))
@@ -22,7 +22,7 @@
   (do 
     (info "Building wareblog system")
     (-> (component/system-map
-         :article-storage (article-storage-test-component/new-storage)
+         :article-storage (atom-storage/new-storage)
          :articles (articles/new-articles-component)
          :http (http-component/new-http-server (http-port (:http-port config-options))))
         (component/system-using {:articles {:storage :article-storage}

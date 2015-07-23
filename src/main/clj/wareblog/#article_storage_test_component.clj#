@@ -1,4 +1,4 @@
-(ns wareblog.article-storage-test-component
+(ns wareblog.atom-s
   (require [com.stuartsierra.component :as component]
            [taoensso.timbre :as timbre]
            [wareblog.article-storage :as storage]
