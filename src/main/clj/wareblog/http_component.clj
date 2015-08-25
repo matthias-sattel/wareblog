@@ -43,7 +43,6 @@
         (server :timeout 100)
         (info "storage")
         (assoc component :server nil))))
-
   )
 
 (defn new-http-server [http-port]

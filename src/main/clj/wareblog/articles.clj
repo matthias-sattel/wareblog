@@ -36,27 +36,16 @@
    })
 
 (defn- article-to-html [article]
-  (do
-    ;(debug "Render article " article " to HTML ," (reduce str (:content
-    ;                                               (edn/read-string
-    ;                                                {:readers edn-readers}
-    ;                                                article))))
-    (debug ;(edn/read-string
-            ;  {:readers edn-readers}
-              (:header article))
-    ;(let [{header :header abstract :abstract content :content} (edn/read-string
-    ;                                         {:readers edn-readers}
-    ;                                         article)]
-    {:header (edn/read-string
+  {:title (edn/read-string
+           {:readers edn-readers}
+           (:title article)),
+   :abstract (edn/read-string
               {:readers edn-readers}
-              (:header article)),
-     :abstract (edn/read-string
-                {:readers edn-readers}
-                (:abstract article)),
-     :content (edn/read-string
-               {:readers edn-readers}
-               (:content article))}
-    ))
+              (:abstract article)),
+   :content (edn/read-string
+             {:readers edn-readers}
+             (:content article))}
+  )
 
 (liberator/defresource article [storage]
   :available-media-types ["application/edn" "text/html"]
@@ -69,8 +58,8 @@
                     "application/edn" (article-storage/get-by-id storage (keyword id))
                     "text/html" ;(let [article-as-html-map (get-article-as-html (keyword id))]
                                   (let [article-as-html-map (article-to-html (article-storage/get-by-id storage (keyword id)))]
-                                  ;(debug article-as-html-map)))
-                                  (render-file "templates/article.html" {:dev (env :wareblog-dev), :title (:header article-as-html-map), :article-title (:header article-as-html-map), :article-abstract (:abstract article-as-html-map), :article-content (:content article-as-html-map)})))
+                                    (debug "Article as html map" article-as-html-map)
+                                    (render-file "templates/article.html" {:dev (env :wareblog-dev), :title (:title article-as-html-map), :article-title (:title article-as-html-map), :article-abstract (:abstract article-as-html-map), :article-content (:content article-as-html-map)})))
                   )))
 
 (liberator/defresource comment-article [storage]
